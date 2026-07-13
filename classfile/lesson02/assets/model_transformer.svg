@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="620" viewBox="0 0 1400 620">
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2F6FA5"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#7B61A8"/>
+    </marker>
+    <filter id="shadow" x="-15%" y="-20%" width="130%" height="145%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#173B63" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="620" fill="#FFFFFF"/>
+  <text x="700" y="46" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="30" font-weight="700" fill="#173B63">Transformer：让序列中的位置直接寻找相关信息</text>
+
+  <!-- 输入序列：行为表示与位置信息共同进入Transformer -->
+  <g font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif">
+    <rect x="40" y="100" width="160" height="72" rx="16" fill="#EAF3FA" stroke="#2F6FA5" stroke-width="2" filter="url(#shadow)"/>
+    <text x="120" y="135" text-anchor="middle" font-size="18" font-weight="700" fill="#173B63">行为 A</text>
+    <text x="120" y="160" text-anchor="middle" font-size="13" fill="#5B6770">行为向量 + 位置编码</text>
+
+    <rect x="310" y="100" width="160" height="72" rx="16" fill="#EAF3FA" stroke="#2F6FA5" stroke-width="2" filter="url(#shadow)"/>
+    <text x="390" y="135" text-anchor="middle" font-size="18" font-weight="700" fill="#173B63">行为 B</text>
+    <text x="390" y="160" text-anchor="middle" font-size="13" fill="#5B6770">行为向量 + 位置编码</text>
+
+    <rect x="580" y="100" width="160" height="72" rx="16" fill="#EAF3FA" stroke="#2F6FA5" stroke-width="2" filter="url(#shadow)"/>
+    <text x="660" y="135" text-anchor="middle" font-size="18" font-weight="700" fill="#173B63">行为 C</text>
+    <text x="660" y="160" text-anchor="middle" font-size="13" fill="#5B6770">行为向量 + 位置编码</text>
+
+    <rect x="850" y="100" width="160" height="72" rx="16" fill="#EAF3FA" stroke="#2F6FA5" stroke-width="2" filter="url(#shadow)"/>
+    <text x="930" y="135" text-anchor="middle" font-size="18" font-weight="700" fill="#173B63">行为 D</text>
+    <text x="930" y="160" text-anchor="middle" font-size="13" fill="#5B6770">行为向量 + 位置编码</text>
+
+    <rect x="1120" y="100" width="160" height="72" rx="16" fill="#EAF3FA" stroke="#2F6FA5" stroke-width="2" filter="url(#shadow)"/>
+    <text x="1200" y="135" text-anchor="middle" font-size="18" font-weight="700" fill="#173B63">行为 E</text>
+    <text x="1200" y="160" text-anchor="middle" font-size="13" fill="#5B6770">行为向量 + 位置编码</text>
+  </g>
+
+  <!-- 不同位置之间可以直接建立关系，紫色弧线使用同色箭头 -->
+  <path d="M120 184 Q255 235 390 184" fill="none" stroke="#7B61A8" stroke-width="2.2" opacity="0.72" marker-end="url(#arrow-purple)"/>
+  <path d="M390 184 Q660 260 930 184" fill="none" stroke="#7B61A8" stroke-width="1.8" opacity="0.65" marker-end="url(#arrow-purple)"/>
+  <path d="M660 184 Q930 260 1200 184" fill="none" stroke="#7B61A8" stroke-width="1.8" opacity="0.65" marker-end="url(#arrow-purple)"/>
+  <path d="M930 184 Q1065 235 1200 184" fill="none" stroke="#7B61A8" stroke-width="2.2" opacity="0.72" marker-end="url(#arrow-purple)"/>
+  <text x="700" y="272" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="700" fill="#7B61A8">任意位置可以直接比较相关性，不必沿序列逐步传递</text>
+
+  <!-- 每个输入使用独立终点进入Self-Attention，避免箭头重叠 -->
+  <line x1="120" y1="172" x2="420" y2="302" stroke="#2F6FA5" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <line x1="390" y1="172" x2="560" y2="302" stroke="#2F6FA5" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <line x1="660" y1="172" x2="700" y2="302" stroke="#2F6FA5" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <line x1="930" y1="172" x2="840" y2="302" stroke="#2F6FA5" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <line x1="1200" y1="172" x2="980" y2="302" stroke="#2F6FA5" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="300" y="312" width="800" height="125" rx="18" fill="#F0ECF7" stroke="#7B61A8" stroke-width="2" filter="url(#shadow)"/>
+  <text x="700" y="343" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="700" fill="#173B63">Self-Attention</text>
+
+  <g font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif">
+    <rect x="375" y="360" width="185" height="48" rx="12" fill="#FFFFFF" stroke="#7B61A8" stroke-width="1.6"/>
+    <text x="467.5" y="390" text-anchor="middle" font-size="16" font-weight="700" fill="#173B63">生成 Q、K、V</text>
+
+    <line x1="560" y1="384" x2="605" y2="384" stroke="#7B61A8" stroke-width="2" marker-end="url(#arrow-purple)"/>
+    <rect x="615" y="360" width="170" height="48" rx="12" fill="#FFFFFF" stroke="#7B61A8" stroke-width="1.6"/>
+    <text x="700" y="390" text-anchor="middle" font-size="16" font-weight="700" fill="#173B63">计算关注权重</text>
+
+    <line x1="785" y1="384" x2="830" y2="384" stroke="#7B61A8" stroke-width="2" marker-end="url(#arrow-purple)"/>
+    <rect x="840" y="360" width="185" height="48" rx="12" fill="#FFFFFF" stroke="#7B61A8" stroke-width="1.6"/>
+    <text x="932.5" y="390" text-anchor="middle" font-size="16" font-weight="700" fill="#173B63">加权聚合信息</text>
+  </g>
+
+  <line x1="700" y1="437" x2="700" y2="472" stroke="#2F6FA5" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <rect x="505" y="482" width="390" height="68" rx="16" fill="#FFF1E3" stroke="#F28E2B" stroke-width="2" filter="url(#shadow)"/>
+  <text x="700" y="516" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="700" fill="#173B63">序列表示 / 下一物品预测</text>
+  <text x="700" y="540" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="14" fill="#5B6770">并行建模不同位置之间的长距离关系</text>
+
+  <text x="700" y="592" text-anchor="middle" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#C94C4C">核心：根据当前预测任务，为不同历史行为分配不同关注权重</text>
+</svg>
