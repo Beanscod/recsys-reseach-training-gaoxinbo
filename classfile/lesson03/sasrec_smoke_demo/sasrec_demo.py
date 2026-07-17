@@ -251,17 +251,44 @@ def right_align(values: Sequence[int], max_len: int) -> list[int]:
 
 
 #对每个用户生成一条训练样本，包括用户编号、输入序列、正确的下一个物品序列，以及随机采样的错误物品序列。
+#定义一个名为 SASRecTrainingDataset 的类，它继承自 PyTorch 的 Dataset，并且这个数据集每次返回一条由四个张量组成的数据。
 class SASRecTrainingDataset(Dataset[tuple[Tensor, Tensor, Tensor, Tensor]]):
     """Create one canonical next-item training sample per user."""
 
     def __init__(self, splits: SequenceSplits, max_len: int, seed: int) -> None:
         self.splits = splits
+        # 保存模型允许的最大序列长度
         self.max_len = max_len
         self.seed = seed
+        # splits.train 是一个字典，例如：
+        #
+        # {
+        #     1: [3, 5, 8],
+        #     2: [2, 7, 4],
+        #     3: [1, 6, 9]
+        # }
+        #
+        # 直接遍历字典得到的是字典的键，也就是用户 ID。
         self.users = sorted(splits.train)
+        # 得到集合1-5
         catalog = set(range(1, splits.item_count + 1))
+        # 创建一个空字典，用于保存每个用户可以选择的负样本。
         self.negative_candidates: dict[int, tuple[int, ...]] = {}
-
+        #构建负样本的集合
+        # splits.sequences[user_id] 是用户完整的交互序列，
+        # 通常包含训练、验证和测试交互。
+        # 例如：
+        # catalog = {1, 2, 3, 4, 5, 6}
+        # 用户交互过：
+        # splits.sequences[user_id] = [1, 3, 5]
+        # 转成集合：
+        # set([1, 3, 5]) = {1, 3, 5}
+        # 集合差集：
+        # catalog - {1, 3, 5}
+        # 得到：
+        # {2, 4, 6}
+        # 这些是用户从未交互过的物品，
+        # 因此可以作为负样本候选。
         for user_id in self.users:
             candidates = tuple(sorted(catalog - set(splits.sequences[user_id])))
             if not candidates:
@@ -271,16 +298,93 @@ class SASRecTrainingDataset(Dataset[tuple[Tensor, Tensor, Tensor, Tensor]]):
     def __len__(self) -> int:
         return len(self.users)
 
+    """
+           根据下标取得一条训练数据。
+
+           参数：
+               index:
+                   数据集中的样本下标。
+
+                   注意：
+                   index 不是用户 ID，而是 self.users 列表的下标。
+
+           返回：
+               (
+                   用户 ID 张量,
+                   输入序列张量,
+                   正样本序列张量,
+                   负样本序列张量
+               )
+           """
     def __getitem__(self, index: int) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+        # 根据下标取得用户 ID。
+        #
+        # 假设：
+        # self.users = [2, 5, 8]
+        #
+        # 当 index = 0：
+        # user_id = 2
+        #
+        # 当 index = 1：
+        # user_id = 5
         user_id = self.users[index]
+        #获取用户的训练序列
         training_sequence = self.splits.train[user_id]
+        # 输入序列取训练序列中除最后一个以外的所有物品。
+        #
+        # 假设：
+        # training_sequence = [10, 20, 30, 40]
+        #
+        # training_sequence[:-1] 得到：
+        # [10, 20, 30]
+        #
+        # 它表示模型已经看到的历史物品。
         input_items = training_sequence[:-1]
+        # 正样本序列取训练序列中除第一个以外的所有物品。
+        #
+        # training_sequence = [10, 20, 30, 40]
+        #
+        # training_sequence[1:] 得到：
+        # [20, 30, 40]
+        #
         positive_items = training_sequence[1:]
 
         rng = random.Random(self.seed + user_id * 1_000_003)
-        candidates = self.negative_candidates[user_id]
-        negative_items = [rng.choice(candidates) for _ in positive_items]
 
+        # 取得当前用户所有可用的负样本候选物品。
+        #
+        # 这些物品是当前用户从未交互过的物品。
+        candidates = self.negative_candidates[user_id]
+        # 为每个正样本随机选择一个负样本。
+        #
+        # rng.choice(candidates)：
+        # 从候选物品中随机选择一个物品。
+        #
+        # for _ in positive_items：
+        # positive_items 中有多少个正样本，
+        # 就生成多少个负样本。
+        #
+        # 例如：
+        #
+        # positive_items = [20, 30, 40]
+        # candidates = (50, 60, 70, 80)
+        #
+        # 可能得到：
+        #
+        # negative_items = [70, 50, 80]
+        negative_items = [rng.choice(candidates) for _ in positive_items]
+        # 对输入序列进行截断或补齐，然后转换为 PyTorch 张量。
+        #
+        # 假设：
+        #
+        # input_items = [10, 20, 30]
+        # max_len = 5
+        #
+        # right_align(...) 通常会返回：
+        #
+        # [0, 0, 10, 20, 30]
+        #
+        # 也就是在左侧补 0，让有效数据靠右对齐。
         sequences = torch.tensor(
             right_align(input_items, self.max_len), dtype=torch.long
         )
